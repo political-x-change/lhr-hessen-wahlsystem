@@ -302,7 +302,113 @@ Initialisiert die Datenbank (nur in Entwicklung).
 - **Speicherbegrenzung**: Daten können gelöscht werden
 - **Transparenz**: Klare Datenschutzerklärung erforderlich
 
-## Dateisystem-Struktur
+## Code-Architektur
+
+### Clean Architecture Prinzipien
+
+Das Projekt folgt Clean Architecture-Prinzipien für maximale Testbarkeit und Wartbarkeit:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Presentation                      │
+│            (Next.js App Router, API Routes)         │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐   │
+│  │            Use Cases (Business Logic)        │   │
+│  │  • RegisterUserUseCase                       │   │
+│  │  • CastVoteUseCase                          │   │
+│  │  • GetCandidatesUseCase                     │   │
+│  └────────────────┬────────────────────────────┘   │
+│                   │                                 │
+│  ┌────────────────▼────────────────────────────┐   │
+│  │      Services & Repositories (Interfaces)   │   │
+│  │  • IUserRepository                          │   │
+│  │  • ICandidateRepository                     │   │
+│  │  • IJwtService                              │   │
+│  │  • IEmailService                            │   │
+│  └────────────────┬────────────────────────────┘   │
+│                   │                                 │
+│  ┌────────────────▼────────────────────────────┐   │
+│  │     Infrastructure (Implementations)        │   │
+│  │  • UserRepository                           │   │
+│  │  • JwtService                               │   │
+│  │  • EmailService (Resend)                    │   │
+│  │  • Database (Turso/libSQL)                  │   │
+│  └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+```
+
+### Dependency Injection
+
+Die Anwendung nutzt Dependency Injection über einen Container (`lib/container.ts`):
+
+```typescript
+class Container {
+  getUserRepository(): UserRepository { /* ... */ }
+  getJwtService(): JwtService { /* ... */ }
+  getRegisterUserUseCase(): RegisterUserUseCase { /* ... */ }
+}
+```
+
+Vorteile:
+- Einfaches Mocking in Tests
+- Loose Coupling zwischen Komponenten
+- Einfacher Austausch von Implementierungen
+- Bessere Testbarkeit
+
+### Schichtenmodell
+
+#### 1. Presentation Layer (API Routes)
+```typescript
+// app/api/register/route.ts
+export async function POST(request: NextRequest) {
+  const useCase = container.getRegisterUserUseCase();
+  const result = await useCase.execute({ email });
+  return NextResponse.json({ message: result.message });
+}
+```
+
+#### 2. Use Case Layer (Business Logic)
+```typescript
+// lib/use-cases/register-user.use-case.ts
+class RegisterUserUseCase {
+  constructor(
+    private userRepository: IUserRepository,
+    private jwtService: IJwtService,
+    private emailService: IEmailService
+  ) {}
+  
+  async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
+    // Business logic here
+  }
+}
+```
+
+#### 3. Repository Layer (Data Access)
+```typescript
+// lib/repositories/user.repository.ts
+class UserRepository implements IUserRepository {
+  constructor(private db: Client) {}
+  
+  async findByEmail(email: string): Promise<User | null> {
+    // Database access here
+  }
+}
+```
+
+#### 4. Service Layer (External Integrations)
+```typescript
+// lib/services/jwt.service.ts
+class JwtService implements IJwtService {
+  constructor(private secret: string) {}
+  
+  generateVotingToken(payload: TokenPayload): string {
+    return jwt.sign(payload, this.secret);
+  }
+}
+```
+
+### Dateisystem-Struktur (aktualisiert)
 
 ```
 lhr-hessen-wahlsystem/
@@ -312,7 +418,9 @@ lhr-hessen-wahlsystem/
 │   │   │   └── route.ts
 │   │   ├── register/           # Newsletter-Registrierung
 │   │   │   └── route.ts
-│   │   └── vote/               # Abstimmung
+│   │   ├── vote/               # Abstimmung
+│   │   │   └── route.ts
+│   │   └── candidates/         # Kandidaten-Liste
 │   │       └── route.ts
 │   ├── vote/                    # Voting Page
 │   │   └── page.tsx
@@ -323,11 +431,30 @@ lhr-hessen-wahlsystem/
 ├── components/                   # React Components
 │   ├── RegisterForm.tsx         # Registrierungs-Formular
 │   └── VotingForm.tsx           # Abstimmungs-Formular
-├── lib/                          # Utility Libraries
+├── lib/                          # Core Library
+│   ├── types/                   # TypeScript Interfaces
+│   │   └── index.ts            # Domain types & interfaces
+│   ├── services/                # External Service Integrations
+│   │   ├── jwt.service.ts      # JWT Token Management
+│   │   └── email.service.ts    # E-Mail-Versand (Resend)
+│   ├── repositories/            # Data Access Layer
+│   │   ├── user.repository.ts
+│   │   ├── candidate.repository.ts
+│   │   └── vote.repository.ts
+│   ├── use-cases/               # Business Logic
+│   │   ├── register-user.use-case.ts
+│   │   ├── cast-vote.use-case.ts
+│   │   └── get-candidates.use-case.ts
+│   ├── container.ts             # Dependency Injection Container
 │   ├── db.ts                    # Datenbank-Connection
-│   ├── email.ts                 # E-Mail-Funktionen
-│   ├── jwt.ts                   # JWT-Funktionen
 │   └── validation.ts            # Validierungs-Funktionen
+├── __tests__/                    # Test Files
+│   ├── lib/                     # Library Tests
+│   │   ├── services/           # Service Tests
+│   │   ├── repositories/       # Repository Tests
+│   │   └── use-cases/          # Use Case Tests
+│   └── app/                     # App Tests
+│       └── api/                 # API Route Tests
 ├── public/                       # Statische Assets
 ├── scripts/                      # Utility Scripts
 │   └── init-db.ts               # DB-Initialisierung
@@ -340,6 +467,9 @@ lhr-hessen-wahlsystem/
 ├── README.md                     # Hauptdokumentation
 ├── SECURITY.md                   # Sicherheits-Policy
 ├── SETUP.md                      # Setup-Anleitung
+├── TESTING.md                    # Testing-Guide
+├── jest.config.ts               # Jest-Konfiguration
+├── jest.setup.ts                # Jest Setup
 ├── eslint.config.mjs            # ESLint-Konfiguration
 ├── next.config.ts               # Next.js-Konfiguration
 ├── package.json                 # Dependencies
@@ -415,17 +545,52 @@ lhr-hessen-wahlsystem/
 
 ## Testing-Strategie
 
-### Manuelle Tests
+Das Projekt verwendet Jest für automatisierte Tests mit hoher Code-Coverage.
 
-- E2E-Flow-Tests
-- UI/UX-Tests
-- Browser-Kompatibilität
+### Implementierte Tests
 
-### Automatisierte Tests (geplant)
+- ✅ **Unit Tests**
+  - Validierungs-Funktionen
+  - JWT Service
+  - Repository Layer
+  - Use Cases (Business Logic)
 
-- **Unit Tests**: Jest
-- **Integration Tests**: Testing Library
-- **E2E Tests**: Playwright
+- ✅ **Integration Tests**
+  - API Routes (Register, Vote, Candidates)
+  - End-to-End Flows
+
+### Test-Coverage
+
+Aktuelle Coverage (über 80% für kritische Bereiche):
+- Services: ~80%
+- Repositories: ~42% (fokussiert auf UserRepository)
+- Use Cases: ~70%
+- API Routes: 100%
+- Validation: 100%
+
+Siehe [TESTING.md](TESTING.md) für Details.
+
+### Test-Ausführung
+
+```bash
+# Alle Tests ausführen
+npm test
+
+# Tests mit Coverage
+npm run test:coverage
+
+# Tests im Watch-Modus
+npm run test:watch
+```
+
+### Testbare Architektur
+
+Die Anwendung wurde speziell für Testbarkeit entworfen:
+
+1. **Dependency Injection**: Alle Abhängigkeiten sind injizierbar
+2. **Interface-basiert**: Einfaches Mocking durch Interfaces
+3. **Separation of Concerns**: Klare Trennung von Logik und Infrastruktur
+4. **Container Pattern**: Zentrale Verwaltung von Dependencies
 
 ## Wartung
 

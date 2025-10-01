@@ -1,14 +1,39 @@
 import "server-only";
-import { createClient } from "@libsql/client";
+import { createClient, Client } from "@libsql/client";
 
-// Initialize Turso (libSQL) database connection
-export const db = createClient({
-  url: process.env.DATABASE_URL!,
-  authToken: process.env.DATABASE_AUTH_TOKEN,
+let dbInstance: Client | null = null;
+
+// Lazy initialization of database connection
+export function getDb(): Client {
+  if (!dbInstance) {
+    const url = process.env.DATABASE_URL;
+    const authToken = process.env.DATABASE_AUTH_TOKEN;
+    
+    if (!url) {
+      throw new Error("DATABASE_URL environment variable is not set");
+    }
+    
+    dbInstance = createClient({
+      url,
+      authToken,
+    });
+  }
+  
+  return dbInstance;
+}
+
+// For backward compatibility
+export const db = new Proxy({} as Client, {
+  get(_target, prop) {
+    const dbInstance = getDb();
+    return dbInstance[prop as keyof Client];
+  },
 });
 
 // Initialize database schema
 export async function initializeDatabase() {
+  const db = getDb();
+  
   try {
     // Users table - stores email and token status
     await db.execute(`
