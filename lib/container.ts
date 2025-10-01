@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { getDb } from "./db";
 import { createJwtService } from "./services/jwt.service";
 import { createEmailService } from "./services/email.service";
 import { UserRepository } from "./repositories/user.repository";
@@ -29,21 +29,21 @@ export class Container {
 
   getUserRepository(): UserRepository {
     if (!this.userRepository) {
-      this.userRepository = new UserRepository(db);
+      this.userRepository = new UserRepository(getDb());
     }
     return this.userRepository;
   }
 
   getCandidateRepository(): CandidateRepository {
     if (!this.candidateRepository) {
-      this.candidateRepository = new CandidateRepository(db);
+      this.candidateRepository = new CandidateRepository(getDb());
     }
     return this.candidateRepository;
   }
 
   getVoteRepository(): VoteRepository {
     if (!this.voteRepository) {
-      this.voteRepository = new VoteRepository(db);
+      this.voteRepository = new VoteRepository(getDb());
     }
     return this.voteRepository;
   }

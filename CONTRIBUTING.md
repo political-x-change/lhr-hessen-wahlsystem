@@ -165,22 +165,35 @@ lhr-hessen-wahlsystem/
 
 ## Testing
 
+### Automatisierte Tests
+
+Das Projekt verwendet Jest für automatisierte Tests. Siehe [TESTING.md](TESTING.md) für Details.
+
+```bash
+# Alle Tests ausführen
+npm test
+
+# Tests mit Coverage
+npm run test:coverage
+
+# Tests im Watch-Modus
+npm run test:watch
+```
+
+Testbereiche:
+- **Unit Tests**: Validierung, Services, Repositories
+- **Integration Tests**: API Routes, Use Cases
+- **Component Tests**: React-Komponenten (geplant)
+
 ### Manuelle Tests
 
-Vor jedem PR:
+Vor jedem PR sollten folgende Szenarien manuell getestet werden:
 
 1. Registrierung testen
 2. E-Mail-Empfang verifizieren
 3. Voting-Prozess durchlaufen
 4. Token-Invalidierung prüfen
 5. Doppelte Abstimmung verhindern
-
-### Automatisierte Tests
-
-Zukünftig geplant:
-- Unit Tests mit Jest
-- Integration Tests mit Testing Library
-- E2E Tests mit Playwright
 
 ## Dokumentation
 

@@ -9,9 +9,6 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const config: Config = {
   coverageProvider: 'v8',
-  testEnvironment: 'jsdom',
-  // Add more setup options before each test is run
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
@@ -26,6 +23,40 @@ const config: Config = {
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
+  ],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  // Configure projects for different test environments
+  projects: [
+    {
+      displayName: 'api',
+      testEnvironment: 'node',
+      testMatch: ['<rootDir>/__tests__/app/api/**/*.test.[jt]s?(x)'],
+      preset: 'ts-jest',
+      moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/$1',
+      },
+    },
+    {
+      displayName: 'lib',
+      testEnvironment: 'node',
+      testMatch: [
+        '<rootDir>/__tests__/lib/**/*.test.[jt]s?(x)',
+      ],
+      preset: 'ts-jest',
+      moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/$1',
+      },
+    },
+    {
+      displayName: 'components',
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+      testMatch: ['<rootDir>/__tests__/components/**/*.test.[jt]s?(x)'],
+      preset: 'ts-jest',
+      moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/$1',
+      },
+    },
   ],
 };
 

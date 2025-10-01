@@ -19,7 +19,41 @@ Eine sichere, DSGVO-konforme Webanwendung für Abstimmungen mit E-Mail-basierter
 - **E-Mail**: Resend
 - **Authentication**: One-Time-JWT (jsonwebtoken)
 - **Styling**: Tailwind CSS 4
+- **Testing**: Jest + Testing Library
 - **Deployment**: Vercel-ready
+
+## Architektur
+
+Das Projekt folgt **Clean Architecture**-Prinzipien für maximale Testbarkeit und Wartbarkeit:
+
+- **Use Cases**: Geschäftslogik isoliert und testbar
+- **Repositories**: Saubere Daten-Abstraktion
+- **Services**: Externe Integrationen (JWT, E-Mail)
+- **Dependency Injection**: Container-Pattern für einfaches Mocking
+
+Siehe [ARCHITECTURE.md](ARCHITECTURE.md) für Details.
+
+## Testing
+
+Das Projekt hat umfangreiche automatisierte Tests:
+
+```bash
+# Alle Tests ausführen
+npm test
+
+# Tests mit Coverage
+npm run test:coverage
+
+# Tests im Watch-Modus
+npm run test:watch
+```
+
+Test-Coverage:
+- ✅ Unit Tests (Validation, Services, Repositories)
+- ✅ Integration Tests (API Routes, Use Cases)
+- ✅ > 80% Coverage für kritische Bereiche
+
+Siehe [TESTING.md](TESTING.md) für Details.
 
 ## Voraussetzungen
 
