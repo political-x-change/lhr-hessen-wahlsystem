@@ -1,4 +1,5 @@
-import { createClient } from '@libsql/client';
+import "server-only";
+import { createClient } from "@libsql/client";
 
 // Initialize Turso (libSQL) database connection
 export const db = createClient({
@@ -40,9 +41,9 @@ export async function initializeDatabase() {
       )
     `);
 
-    console.log('Database initialized successfully');
+    console.log("Database initialized successfully");
   } catch (error) {
-    console.error('Database initialization error:', error);
+    console.error("Database initialization error:", error);
     throw error;
   }
 }

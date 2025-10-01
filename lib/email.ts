@@ -1,16 +1,16 @@
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function sendVotingEmail(email: string, token: string) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const votingLink = `${appUrl}/vote?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'LHR Hessen Wahlsystem <noreply@yourdomain.com>', // Replace with your verified domain
+      from: "LHR Hessen Wahlsystem <poxc@lgll.dev>", // Replace with your verified domain
       to: [email],
-      subject: 'Ihr persönlicher Wahllink',
+      subject: "Ihr persönlicher Wahllink",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333;">Willkommen zum LHR Hessen Wahlsystem</h1>
@@ -34,13 +34,13 @@ export async function sendVotingEmail(email: string, token: string) {
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Failed to send email');
+      console.error("Error sending email:", error);
+      throw new Error("Failed to send email");
     }
 
     return data;
   } catch (error) {
-    console.error('Email error:', error);
+    console.error("Email error:", error);
     throw error;
   }
 }
