@@ -1,6 +1,7 @@
 import { POST } from "@/app/api/register/route";
 import { container } from "@/lib/container";
 import { RegisterUserUseCase } from "@/lib/use-cases/register-user.use-case";
+import { NextRequest } from "next/server";
 
 // Mock the container
 jest.mock("@/lib/container", () => ({
@@ -33,7 +34,7 @@ describe("POST /api/register", () => {
       alreadyRegistered: false,
     });
 
-    const request = new Request("http://localhost:3000/api/register", {
+    const request = new NextRequest("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +57,7 @@ describe("POST /api/register", () => {
       new Error("Ungültige E-Mail-Adresse")
     );
 
-    const request = new Request("http://localhost:3000/api/register", {
+    const request = new NextRequest("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +77,7 @@ describe("POST /api/register", () => {
       new Error("Sie haben bereits abgestimmt")
     );
 
-    const request = new Request("http://localhost:3000/api/register", {
+    const request = new NextRequest("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +99,7 @@ describe("POST /api/register", () => {
       alreadyRegistered: true,
     });
 
-    const request = new Request("http://localhost:3000/api/register", {
+    const request = new NextRequest("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -118,7 +119,7 @@ describe("POST /api/register", () => {
       new Error("Database connection failed")
     );
 
-    const request = new Request("http://localhost:3000/api/register", {
+    const request = new NextRequest("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

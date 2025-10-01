@@ -1,6 +1,7 @@
 import { POST } from "@/app/api/vote/route";
 import { container } from "@/lib/container";
 import { CastVoteUseCase } from "@/lib/use-cases/cast-vote.use-case";
+import { NextRequest } from "next/server";
 
 // Mock the container
 jest.mock("@/lib/container", () => ({
@@ -32,7 +33,7 @@ describe("POST /api/vote", () => {
       message: "Ihre Stimme wurde erfolgreich abgegeben",
     });
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +55,7 @@ describe("POST /api/vote", () => {
   it("should return 400 for missing token", async () => {
     mockCastVoteUseCase.execute.mockRejectedValue(new Error("Token fehlt"));
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,7 +75,7 @@ describe("POST /api/vote", () => {
       new Error("Ungültiger oder abgelaufener Token")
     );
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +95,7 @@ describe("POST /api/vote", () => {
       new Error("Benutzer nicht gefunden")
     );
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +115,7 @@ describe("POST /api/vote", () => {
       new Error("Sie haben bereits abgestimmt")
     );
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +135,7 @@ describe("POST /api/vote", () => {
       new Error("Bitte wählen Sie einen Kandidaten aus")
     );
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -154,7 +155,7 @@ describe("POST /api/vote", () => {
       new Error("Database connection failed")
     );
 
-    const request = new Request("http://localhost:3000/api/vote", {
+    const request = new NextRequest("http://localhost:3000/api/vote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
