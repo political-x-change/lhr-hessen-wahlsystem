@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   webpack: (config) => {
-    // Ignore LICENSE files
+    // Ignore LICENSE and README files
     config.module.rules.push({
-      test: /LICENSE$/,
+      test: /\/(LICENSE|README\.md)$/,
       type: 'asset/source',
     });
     return config;
