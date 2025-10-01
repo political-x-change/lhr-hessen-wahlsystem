@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, FormEvent, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 interface Candidate {
@@ -13,7 +13,6 @@ interface Candidate {
 
 export default function VotingForm() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [token, setToken] = useState('');
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(null);
@@ -81,11 +80,6 @@ export default function VotingForm() {
       } else {
         setMessage(data.message);
         setVoted(true);
-        
-        // Redirect to home after 3 seconds
-        setTimeout(() => {
-          router.push('/');
-        }, 3000);
       }
     } catch {
       setError('Netzwerkfehler. Bitte versuchen Sie es erneut.');
@@ -102,7 +96,7 @@ export default function VotingForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-lg font-semibold">{message}</p>
-          <p className="mt-2">Sie werden in wenigen Sekunden weitergeleitet...</p>
+          <p className="mt-2">Vielen Dank für Ihre Teilnahme!</p>
         </div>
       </div>
     );

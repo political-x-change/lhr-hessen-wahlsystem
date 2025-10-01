@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { generateVotingToken } from '@/lib/jwt';
-import { sendVotingEmail } from '@/lib/email';
 import { isValidEmail } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
@@ -22,11 +20,8 @@ export async function POST(request: NextRequest) {
       args: [email],
     });
 
-    let userId: number;
-
     if (existingUser.rows.length > 0) {
       const user = existingUser.rows[0];
-      userId = user.id as number;
 
       // Check if user has already voted
       if (user.token_used === 1) {
@@ -35,23 +30,21 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      
+      // User already registered but hasn't voted yet
+      return NextResponse.json({
+        message: 'Sie sind bereits registriert. Der Wahllink wird zu gegebener Zeit per E-Mail versendet.',
+      });
     } else {
       // Insert new user
-      const result = await db.execute({
+      await db.execute({
         sql: 'INSERT INTO users (email, token_used) VALUES (?, 0)',
         args: [email],
       });
-      userId = Number(result.lastInsertRowid);
     }
 
-    // Generate one-time voting token
-    const token = generateVotingToken({ email, userId });
-
-    // Send voting email
-    await sendVotingEmail(email, token);
-
     return NextResponse.json({
-      message: 'Registrierung erfolgreich. Bitte überprüfen Sie Ihre E-Mail.',
+      message: 'Registrierung erfolgreich. Der Wahllink wird zu gegebener Zeit per E-Mail versendet.',
     });
   } catch (error) {
     console.error('Registration error:', error);
