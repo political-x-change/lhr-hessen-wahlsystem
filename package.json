@@ -1,0 +1,38 @@
+{
+  "name": "lhr-hessen-wahlsystem",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "init-db": "tsx scripts/init-db.ts",
+    "send-emails": "tsx scripts/send-voting-emails.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "resend": "^6.1.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "node-loader": "^2.1.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}
