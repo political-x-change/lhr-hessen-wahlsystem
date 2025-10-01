@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyVotingToken } from '@/lib/jwt';
-import { isValidCandidateName, isValidDescription } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, candidateName, description } = await request.json();
+    const { token, candidateId } = await request.json();
 
     // Validate token
     if (!token) {
@@ -43,26 +42,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate candidate name
-    if (!candidateName || !isValidCandidateName(candidateName)) {
+    // Validate candidate ID
+    if (!candidateId) {
       return NextResponse.json(
-        { error: 'Ungültiger Name. Format: "Vorname N." (z.B. "Leo G.")' },
+        { error: 'Bitte wählen Sie einen Kandidaten aus' },
         { status: 400 }
       );
     }
 
-    // Validate description
-    if (!description || !isValidDescription(description)) {
+    // Verify candidate exists
+    const candidate = await db.execute({
+      sql: 'SELECT id FROM candidates WHERE id = ?',
+      args: [candidateId],
+    });
+
+    if (candidate.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Beschreibung muss zwischen 1 und 140 Zeichen lang sein' },
+        { error: 'Ungültiger Kandidat' },
         { status: 400 }
       );
     }
 
     // Insert anonymous vote
     await db.execute({
-      sql: 'INSERT INTO votes (candidate_name, description) VALUES (?, ?)',
-      args: [candidateName, description],
+      sql: 'INSERT INTO votes (candidate_id) VALUES (?)',
+      args: [candidateId],
     });
 
     // Mark token as used (invalidate)

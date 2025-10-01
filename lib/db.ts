@@ -19,13 +19,24 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Candidates table - stores candidate information
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS candidates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        image_url TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Votes table - anonymized, no link to users
     await db.execute(`
       CREATE TABLE IF NOT EXISTS votes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        candidate_name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        candidate_id INTEGER NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (candidate_id) REFERENCES candidates(id)
       )
     `);
 
