@@ -3,13 +3,7 @@
 import { useState, FormEvent, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-
-interface Candidate {
-  id: number;
-  name: string;
-  description: string;
-  image_url: string | null;
-}
+import type { Candidate } from "@/lib/types";
 
 export default function VotingForm() {
   const searchParams = useSearchParams();
@@ -60,7 +54,7 @@ export default function VotingForm() {
     e.preventDefault();
 
     if (!selectedCandidateId) {
-      setError("Bitte wählen Sie einen Kandidaten aus");
+      setError("Bitte wähle deinen Kandidaten aus.");
       return;
     }
 
