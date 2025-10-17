@@ -1,11 +1,17 @@
 import type { Candidate } from "@/lib/types";
 import { CircleCheck } from "lucide-react";
 
-export default function VotingCandidateCard(
-  candidate: Candidate,
-  isSelected: boolean,
-  setSelectedCandidateId: (id: number) => void
-) {
+type VotingCandidateCardProps = {
+  candidate: Candidate;
+  isSelected: boolean;
+  setSelectedCandidateId: (id: number) => void;
+};
+
+export default function VotingCandidateCard({
+  candidate,
+  isSelected,
+  setSelectedCandidateId,
+}: VotingCandidateCardProps) {
   return (
     <div
       key={candidate.id}
@@ -31,7 +37,10 @@ export default function VotingCandidateCard(
       </p>
 
       {isSelected && (
-        <CircleCheck className="mt-3 flex items-center text-primary" />
+        <div className="text-primary text-sm flex flex-row items-center mt-3 gap-1">
+          <CircleCheck className="flex items-center text-primary w-4 h-auto " />
+          <p>Ausgewählt</p>
+        </div>
       )}
     </div>
   );
