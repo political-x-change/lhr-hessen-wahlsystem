@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { container } from '@/lib/container';
+import { type NextRequest, NextResponse } from "next/server";
+import { container } from "@/lib/container";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,16 +12,19 @@ export async function POST(request: NextRequest) {
       message: result.message,
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-    
+    console.error("Registration error:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
+
     // Determine status code based on error message
-    const status = errorMessage.includes('Ungültige') || errorMessage.includes('bereits') ? 400 : 500;
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status }
-    );
+    const status =
+      errorMessage.includes("Ungültige") || errorMessage.includes("bereits")
+        ? 400
+        : 500;
+
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

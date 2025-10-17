@@ -33,21 +33,18 @@ const resend = new Resend(RESEND_API_KEY);
 
 const VOTING_EMAIL_HTML = (votingLink: string) => `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h1 style="color: #333;">Willkommen zum LHR Hessen Wahlsystem</h1>
-    <p>Sie haben sich für das Wahlsystem registriert.</p>
-    <p>Bitte klicken Sie auf den folgenden Link, um Ihre Stimme abzugeben:</p>
-    <a href="${votingLink}" style="display: inline-block; background-color: #0070f3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
+    <h1 style="color: #333;">Landesheimratwahlen ${new Date().getFullYear()}</h1>
+    <p>Die Wahlen zum Landesheimrat Hessen sind eröffnet!</p>
+    <p>Bitte klicke auf den folgenden Link, um deine Stimme abzugeben:</p>
+    <a href="${votingLink}" style="display: inline-block; background-color: #0e4f5d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
       Zur Abstimmung
     </a>
     <p style="color: #666; font-size: 14px;">
-      Dieser Link ist einmalig gültig und kann nur für eine Abstimmung verwendet werden.
-    </p>
-    <p style="color: #666; font-size: 14px;">
-      Falls Sie diese E-Mail nicht angefordert haben, ignorieren Sie sie bitte.
+      Dieser Link ist einmalig gültig und kann nur für eine Abstimmung verwendet werden. Falls du diese E-Mail nicht angefordert hast, ignoriere sie bitte.
     </p>
     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
     <p style="color: #999; font-size: 12px;">
-      Diese E-Mail wurde im Rahmen des DSGVO-konformen LHR Hessen Wahlsystems versendet.
+      Diese E-Mail wurde im Rahmen des von Political X Change entwickelten Wahlsystems versendet. 
     </p>
   </div>
 `;
