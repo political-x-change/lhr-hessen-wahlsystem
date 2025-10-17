@@ -18,8 +18,8 @@ export class JwtService implements IJwtService {
     try {
       const decoded = jwt.verify(token, this.secret) as TokenPayload;
       return decoded;
-    } catch (error) {
-      console.error("Token verification error:", error);
+    } catch {
+      // Token is invalid or expired
       return null;
     }
   }

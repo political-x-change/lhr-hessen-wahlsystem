@@ -44,15 +44,13 @@ export class GetCandidatesUseCase {
       }
 
       return candidates;
-    } catch (error) {
-      console.error("Error fetching candidates:", error);
-
+    } catch {
       // Return mock data if database fails and mock data is enabled
       if (this.useMockDataAsFallback) {
         return MOCK_CANDIDATES;
       }
 
-      throw error;
+      throw new Error("Failed to fetch candidates from database");
     }
   }
 }

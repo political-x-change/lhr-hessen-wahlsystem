@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { container } from '@/lib/container';
+import { AppError } from '@/lib/errors';
 
 export async function GET() {
   try {
@@ -10,7 +11,13 @@ export async function GET() {
       candidates,
     });
   } catch (error) {
-    console.error('Error fetching candidates:', error);
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch candidates' },
       { status: 500 }

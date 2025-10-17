@@ -1,6 +1,7 @@
 import { POST } from "@/app/api/register/route";
 import { container } from "@/lib/container";
 import { RegisterUserUseCase } from "@/lib/use-cases/register-user.use-case";
+import { ValidationError, ConflictError } from "@/lib/errors";
 import { NextRequest } from "next/server";
 
 // Mock the container
@@ -54,7 +55,7 @@ describe("POST /api/register", () => {
 
   it("should return 400 for invalid email", async () => {
     mockRegisterUserUseCase.execute.mockRejectedValue(
-      new Error("Ungültige E-Mail-Adresse")
+      new ValidationError("Ungültige E-Mail-Adresse")
     );
 
     const request = new NextRequest("http://localhost:3000/api/register", {
@@ -74,7 +75,7 @@ describe("POST /api/register", () => {
 
   it("should return 400 if user already voted", async () => {
     mockRegisterUserUseCase.execute.mockRejectedValue(
-      new Error("Sie haben bereits abgestimmt")
+      new ConflictError("Sie haben bereits abgestimmt")
     );
 
     const request = new NextRequest("http://localhost:3000/api/register", {
@@ -88,7 +89,7 @@ describe("POST /api/register", () => {
     const response = await POST(request);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(409);
     expect(data.error).toContain("bereits abgestimmt");
   });
 

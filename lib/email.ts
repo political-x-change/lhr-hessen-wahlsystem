@@ -34,13 +34,14 @@ export async function sendVotingEmail(email: string, token: string) {
     });
 
     if (error) {
-      console.error("Error sending email:", error);
-      throw new Error("Failed to send email");
+      throw new Error(`Failed to send email: ${error.message || 'Unknown error'}`);
     }
 
     return data;
   } catch (error) {
-    console.error("Email error:", error);
-    throw error;
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Failed to send email");
   }
 }

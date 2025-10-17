@@ -1,10 +1,17 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import VotingForm from "@/components/VotingForm";
 
 function VoteContent() {
   return (
     <div className="flex flex-col items-center">
-      <img src="/lhr.png" alt="Logo des Landesheimrats Hessen" />
+      <Image
+        src="/lhr.png"
+        alt="Logo des Landesheimrats Hessen"
+        width={200}
+        height={100}
+        priority
+      />
       <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
         Abstimmung
       </h1>

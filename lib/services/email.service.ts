@@ -27,12 +27,13 @@ export class EmailService implements IEmailService {
       });
 
       if (error) {
-        console.error("Error sending email:", error);
-        throw new Error("Failed to send email");
+        throw new Error(`Failed to send email: ${error.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Email error:", error);
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Failed to send email");
     }
   }
 
