@@ -1,5 +1,6 @@
 import { IUserRepository, IJwtService, IEmailService } from "../types";
 import { isValidEmail } from "../validation";
+import { ValidationError, ConflictError } from "../errors";
 
 export interface RegisterUserInput {
   email: string;
@@ -21,7 +22,7 @@ export class RegisterUserUseCase {
   async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
     // Validate email
     if (!input.email || !isValidEmail(input.email)) {
-      throw new Error("Ungültige E-Mail-Adresse");
+      throw new ValidationError("Ungültige E-Mail-Adresse");
     }
 
     // Check if user already exists
@@ -30,7 +31,7 @@ export class RegisterUserUseCase {
     if (existingUser) {
       // Check if user has already voted
       if (existingUser.token_used === 1) {
-        throw new Error("Sie haben bereits abgestimmt");
+        throw new ConflictError("Sie haben bereits abgestimmt");
       }
 
       // User already registered but hasn't voted yet

@@ -4,6 +4,12 @@ import {
   IVoteRepository,
   IJwtService,
 } from "../types";
+import {
+  ValidationError,
+  AuthenticationError,
+  NotFoundError,
+  ConflictError,
+} from "../errors";
 
 export interface CastVoteInput {
   token: string;
@@ -26,33 +32,33 @@ export class CastVoteUseCase {
   async execute(input: CastVoteInput): Promise<CastVoteOutput> {
     // Validate token
     if (!input.token) {
-      throw new Error("Token fehlt");
+      throw new ValidationError("Token fehlt");
     }
 
     const payload = this.jwtService.verifyVotingToken(input.token);
     if (!payload) {
-      throw new Error("Ungültiger oder abgelaufener Token");
+      throw new AuthenticationError();
     }
 
     // Check if user exists and hasn't voted
     const user = await this.userRepository.findById(payload.userId);
     if (!user) {
-      throw new Error("Benutzer nicht gefunden");
+      throw new NotFoundError("Benutzer nicht gefunden");
     }
 
     if (user.token_used === 1) {
-      throw new Error("Sie haben bereits abgestimmt");
+      throw new ConflictError("Sie haben bereits abgestimmt");
     }
 
     // Validate candidate ID
     if (!input.candidateId) {
-      throw new Error("Bitte wählen Sie einen Kandidaten aus");
+      throw new ValidationError("Bitte wählen Sie einen Kandidaten aus");
     }
 
     // Verify candidate exists
     const candidate = await this.candidateRepository.findById(input.candidateId);
     if (!candidate) {
-      throw new Error("Ungültiger Kandidat");
+      throw new NotFoundError("Ungültiger Kandidat");
     }
 
     // Create anonymous vote
