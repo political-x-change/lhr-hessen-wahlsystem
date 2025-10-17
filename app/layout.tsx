@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LHR Hessen Wahlsystem",
-  description: "Sicheres und DSGVO-konformes Wahlsystem für die LHR Hessen",
+  title: `Landesheimratswahl Hessen ${new Date().getFullYear()}`,
 };
 
 export default function RootLayout({
@@ -13,6 +12,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de">
+      <head>
+        <link rel="icon" type="image/x-icon" href="/lhr.png" />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
