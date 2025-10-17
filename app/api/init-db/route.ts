@@ -22,9 +22,12 @@ export async function GET() {
       message: "Database initialized successfully",
     });
   } catch (error) {
-    console.error("Database initialization error:", error);
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : "Failed to initialize database";
+    
     return NextResponse.json(
-      { error: "Failed to initialize database" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

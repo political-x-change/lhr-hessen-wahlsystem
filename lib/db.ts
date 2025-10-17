@@ -65,10 +65,10 @@ export async function initializeDatabase() {
         FOREIGN KEY (candidate_id) REFERENCES candidates(id)
       )
     `);
-
-    console.log("Database initialized successfully");
   } catch (error) {
-    console.error("Database initialization error:", error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error(`Database initialization failed: ${error.message}`);
+    }
+    throw new Error("Database initialization failed");
   }
 }
