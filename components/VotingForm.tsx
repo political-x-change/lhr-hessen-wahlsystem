@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import type { Candidate } from "@/lib/types";
 import VotingCandidateCard from "./voting/VotingCandidateCard";
+import SharedSpinner from "./shared/SharedSpinner";
 
 export default function VotingForm() {
   const searchParams = useSearchParams();
@@ -121,8 +122,8 @@ export default function VotingForm() {
 
   if (loadingCandidates) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+      <div className="flex flex-col items-center py-8">
+        <SharedSpinner size={48} />
         <p className="mt-4 text-gray-600">Kandidaten werden geladen...</p>
       </div>
     );
@@ -140,7 +141,7 @@ export default function VotingForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Wählen Sie einen Kandidaten:
+          Wähle deinen Kandidaten:
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,7 +165,7 @@ export default function VotingForm() {
       <button
         type="submit"
         disabled={loading || !token || !selectedCandidateId}
-        className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:cursor-pointer hover:bg-primary/90 focus:ring-4 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition border-primary"
       >
         {loading ? "Wird gesendet..." : "Stimme abgeben"}
       </button>
