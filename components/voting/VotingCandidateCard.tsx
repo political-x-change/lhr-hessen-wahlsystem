@@ -41,7 +41,7 @@ export default function VotingCandidateCard({
 
         {isSelected && (
           <div className="text-primary dark:text-text-dark text-sm flex flex-row items-center mt-3 gap-1">
-            <CircleCheck className="flex items-center  w-4 h-auto " />
+            <CircleCheck className="flex items-center w-4 h-auto" />
             <p>Ausgewählt</p>
           </div>
         )}
