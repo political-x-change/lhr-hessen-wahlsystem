@@ -1,12 +1,12 @@
 import { getDb } from "./db";
-import { createJwtService } from "./services/jwt.service";
-import { createEmailService } from "./services/email.service";
-import { UserRepository } from "./repositories/user.repository";
 import { CandidateRepository } from "./repositories/candidate.repository";
+import { UserRepository } from "./repositories/user.repository";
 import { VoteRepository } from "./repositories/vote.repository";
-import { RegisterUserUseCase } from "./use-cases/register-user.use-case";
+import { createEmailService } from "./services/email.service";
+import { createJwtService } from "./services/jwt.service";
 import { CastVoteUseCase } from "./use-cases/cast-vote.use-case";
 import { GetCandidatesUseCase } from "./use-cases/get-candidates.use-case";
+import { RegisterUserUseCase } from "./use-cases/register-user.use-case";
 
 /**
  * Dependency injection container
@@ -89,7 +89,7 @@ export class Container {
 		if (!this.getCandidatesUseCase) {
 			this.getCandidatesUseCase = new GetCandidatesUseCase(
 				this.getCandidateRepository(),
-				true, // Use mock data as fallback
+				false,
 			);
 		}
 		return this.getCandidatesUseCase;
