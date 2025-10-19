@@ -1,13 +1,13 @@
-import type { Client } from "@libsql/client";
+import type { Client } from "pg";
 import type { IUserRepository, User } from "../types";
 
 export class UserRepository implements IUserRepository {
 	constructor(private readonly db: Client) {}
 
 	async findByEmail(email: string): Promise<User | null> {
-		const result = await this.db.execute({
-			sql: "SELECT id, email, token_used, created_at FROM users WHERE email = ?",
-			args: [email],
+		const result = await this.db.query({
+			text: "SELECT id, email, token_used, created_at FROM users WHERE email = $1",
+			values: [email],
 		});
 
 		if (result.rows.length === 0) {
@@ -24,9 +24,9 @@ export class UserRepository implements IUserRepository {
 	}
 
 	async findById(id: number): Promise<User | null> {
-		const result = await this.db.execute({
-			sql: "SELECT id, email, token_used, created_at FROM users WHERE id = ?",
-			args: [id],
+		const result = await this.db.query({
+			text: "SELECT id, email, token_used, created_at FROM users WHERE id = $1",
+			values: [id],
 		});
 
 		if (result.rows.length === 0) {
@@ -43,9 +43,9 @@ export class UserRepository implements IUserRepository {
 	}
 
 	async create(email: string): Promise<User> {
-		const result = await this.db.execute({
-			sql: "INSERT INTO users (email, token_used) VALUES (?, 0) RETURNING id, email, token_used, created_at",
-			args: [email],
+		const result = await this.db.query({
+			text: "INSERT INTO users (email, token_used) VALUES ($1, 0) RETURNING id, email, token_used, created_at",
+			values: [email],
 		});
 
 		if (result.rows.length === 0) {
@@ -67,9 +67,9 @@ export class UserRepository implements IUserRepository {
 	}
 
 	async markTokenAsUsed(userId: number): Promise<void> {
-		await this.db.execute({
-			sql: "UPDATE users SET token_used = 1 WHERE id = ?",
-			args: [userId],
+		await this.db.query({
+			text: "UPDATE users SET token_used = 1 WHERE id = ?",
+			values: [userId],
 		});
 	}
 }

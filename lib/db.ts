@@ -1,21 +1,19 @@
 import "server-only";
-import { createClient, type Client } from "@libsql/client";
+import { Client } from "pg";
 
 let dbInstance: Client | null = null;
 
 // Lazy initialization of database connection
 export function getDb(): Client {
 	if (!dbInstance) {
-		const url = process.env.DATABASE_URL;
-		const authToken = process.env.DATABASE_AUTH_TOKEN;
+		const connectionString = process.env.DATABASE_URL;
 
-		if (!url) {
+		if (!connectionString) {
 			throw new Error("DATABASE_URL environment variable is not set");
 		}
 
-		dbInstance = createClient({
-			url,
-			authToken,
+		dbInstance = new Client({
+			connectionString,
 		});
 	}
 
@@ -36,7 +34,7 @@ export async function initializeDatabase() {
 
 	try {
 		// Users table - stores email and token status
-		await db.execute(`
+		await db.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
@@ -46,7 +44,7 @@ export async function initializeDatabase() {
     `);
 
 		// Candidates table - stores candidate information
-		await db.execute(`
+		await db.query(`
       CREATE TABLE IF NOT EXISTS candidates (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -57,7 +55,7 @@ export async function initializeDatabase() {
     `);
 
 		// Votes table - anonymized, no link to users
-		await db.execute(`
+		await db.query(`
       CREATE TABLE IF NOT EXISTS votes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         candidate_id INTEGER NOT NULL,

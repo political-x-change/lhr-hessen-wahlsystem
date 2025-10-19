@@ -46,7 +46,6 @@ export interface IUserRepository {
 export interface ICandidateRepository {
 	findAll(): Promise<Candidate[]>;
 	findById(id: number): Promise<Candidate | null>;
-	create(candidate: Omit<Candidate, "id" | "created_at">): Promise<Candidate>;
 }
 
 export interface IVoteRepository {

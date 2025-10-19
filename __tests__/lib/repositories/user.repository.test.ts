@@ -1,10 +1,10 @@
+import type { Client } from "pg";
 import { UserRepository } from "@/lib/repositories/user.repository";
-import type { Client } from "@libsql/client";
 
 // Mock the database client
 const mockExecute = jest.fn();
 const mockDb = {
-	execute: mockExecute,
+	query: mockExecute,
 } as unknown as Client;
 
 describe("UserRepository", () => {
@@ -32,8 +32,8 @@ describe("UserRepository", () => {
 
 			expect(result).toEqual(mockUser);
 			expect(mockExecute).toHaveBeenCalledWith({
-				sql: "SELECT id, email, token_used, created_at FROM users WHERE email = ?",
-				args: ["test@example.com"],
+				text: "SELECT id, email, token_used, created_at FROM users WHERE email = $1",
+				values: ["test@example.com"],
 			});
 		});
 
@@ -67,8 +67,8 @@ describe("UserRepository", () => {
 
 			expect(result).toEqual(mockUser);
 			expect(mockExecute).toHaveBeenCalledWith({
-				sql: "SELECT id, email, token_used, created_at FROM users WHERE id = ?",
-				args: [1],
+				text: "SELECT id, email, token_used, created_at FROM users WHERE id = $1",
+				values: [1],
 			});
 		});
 
@@ -100,8 +100,8 @@ describe("UserRepository", () => {
 
 			expect(result).toEqual(mockUser);
 			expect(mockExecute).toHaveBeenCalledWith({
-				sql: "INSERT INTO users (email, token_used) VALUES (?, 0) RETURNING id, email, token_used, created_at",
-				args: ["new@example.com"],
+				text: "INSERT INTO users (email, token_used) VALUES ($1, 0) RETURNING id, email, token_used, created_at",
+				values: ["new@example.com"],
 			});
 		});
 
@@ -133,8 +133,8 @@ describe("UserRepository", () => {
 			await userRepository.markTokenAsUsed(1);
 
 			expect(mockExecute).toHaveBeenCalledWith({
-				sql: "UPDATE users SET token_used = 1 WHERE id = ?",
-				args: [1],
+				text: "UPDATE users SET token_used = 1 WHERE id = ?",
+				values: [1],
 			});
 		});
 	});

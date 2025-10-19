@@ -1,13 +1,13 @@
-import type { Client } from "@libsql/client";
+import type { Client } from "pg";
 import type { IVoteRepository, Vote } from "../types";
 
 export class VoteRepository implements IVoteRepository {
 	constructor(private readonly db: Client) {}
 
 	async create(candidateId: number): Promise<Vote> {
-		const result = await this.db.execute({
-			sql: "INSERT INTO votes (candidate_id) VALUES (?) RETURNING id, candidate_id, created_at",
-			args: [candidateId],
+		const result = await this.db.query({
+			text: "INSERT INTO votes (candidate_id) VALUES ($1) RETURNING id, candidate_id, created_at",
+			values: [candidateId],
 		});
 
 		if (result.rows.length === 0) {
@@ -23,9 +23,9 @@ export class VoteRepository implements IVoteRepository {
 	}
 
 	async countByCandidateId(candidateId: number): Promise<number> {
-		const result = await this.db.execute({
-			sql: "SELECT COUNT(*) as count FROM votes WHERE candidate_id = ?",
-			args: [candidateId],
+		const result = await this.db.query({
+			text: "SELECT COUNT(*) as count FROM votes WHERE candidate_id = $1",
+			values: [candidateId],
 		});
 
 		if (result.rows.length === 0) {
