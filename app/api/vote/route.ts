@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
 	try {
 		const { token, candidateId } = await request.json();
 
-		const castVoteUseCase = container.getCastVoteUseCase();
+		const castVoteUseCase = await container.getCastVoteUseCase();
 		const result = await castVoteUseCase.execute({ token, candidateId });
 
 		return NextResponse.json({

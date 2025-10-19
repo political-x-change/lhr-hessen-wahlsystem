@@ -68,7 +68,7 @@ export class UserRepository implements IUserRepository {
 
 	async markTokenAsUsed(userId: number): Promise<void> {
 		await this.db.query({
-			text: "UPDATE users SET token_used = 1 WHERE id = ?",
+			text: "UPDATE users SET token_used = 1 WHERE id = $1",
 			values: [userId],
 		});
 	}

@@ -133,7 +133,7 @@ describe("UserRepository", () => {
 			await userRepository.markTokenAsUsed(1);
 
 			expect(mockExecute).toHaveBeenCalledWith({
-				text: "UPDATE users SET token_used = 1 WHERE id = ?",
+				text: "UPDATE users SET token_used = 1 WHERE id = $1",
 				values: [1],
 			});
 		});

@@ -4,7 +4,7 @@ import { AppError } from "@/lib/errors";
 
 export async function GET() {
 	try {
-		const getCandidatesUseCase = container.getGetCandidatesUseCase();
+		const getCandidatesUseCase = await container.getGetCandidatesUseCase();
 		const candidates = await getCandidatesUseCase.execute();
 
 		return NextResponse.json({
