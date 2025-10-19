@@ -1,47 +1,51 @@
-import type { Candidate } from "@/lib/types";
 import { CircleCheck } from "lucide-react";
+import type { Candidate } from "@/lib/types";
 
 type VotingCandidateCardProps = {
-  candidate: Candidate;
-  isSelected: boolean;
-  setSelectedCandidateId: (id: number) => void;
+	candidate: Candidate;
+	isSelected: boolean;
+	setSelectedCandidateId: (id: number) => void;
 };
 
 export default function VotingCandidateCard({
-  candidate,
-  isSelected,
-  setSelectedCandidateId,
+	candidate,
+	isSelected,
+	setSelectedCandidateId,
 }: VotingCandidateCardProps) {
-  return (
-    <div
-      key={candidate.id}
-      onClick={() => setSelectedCandidateId(candidate.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          setSelectedCandidateId(candidate.id);
-        }
-      }}
-      className={`
-                        cursor-pointer rounded-lg border-2 p-4 transition-all
-                        ${
-                          isSelected
-                            ? "border-primary bg-blue-50 shadow-md"
-                            : "border-gray-200 hover:border-primary hover:shadow-sm"
-                        }
-                      `}
-    >
-      <h3 className="font-bold text-lg text-gray-900 mb-2">{candidate.name}</h3>
+	return (
+		<div key={candidate.id}>
+			<button
+				type="button"
+				onClick={() => setSelectedCandidateId(candidate.id)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						setSelectedCandidateId(candidate.id);
+					}
+				}}
+				className={`
+            cursor-pointer rounded-lg border-2 p-4 transition-all
+            ${
+							isSelected
+								? "border-primary bg-blue-50 shadow-md"
+								: "border-gray-200 hover:border-primary hover:shadow-sm"
+						}
+            `}
+			>
+				<h3 className="font-bold text-lg text-gray-900 mb-2">
+					{candidate.name}
+				</h3>
 
-      <p className="text-sm text-gray-600 line-clamp-3">
-        {candidate.description}
-      </p>
+				<p className="text-sm text-gray-600 line-clamp-3">
+					{candidate.description}
+				</p>
 
-      {isSelected && (
-        <div className="text-primary text-sm flex flex-row items-center mt-3 gap-1">
-          <CircleCheck className="flex items-center text-primary w-4 h-auto " />
-          <p>Ausgewählt</p>
-        </div>
-      )}
-    </div>
-  );
+				{isSelected && (
+					<div className="text-primary text-sm flex flex-row items-center mt-3 gap-1">
+						<CircleCheck className="flex items-center text-primary w-4 h-auto " />
+						<p>Ausgewählt</p>
+					</div>
+				)}
+			</button>
+		</div>
+	);
 }

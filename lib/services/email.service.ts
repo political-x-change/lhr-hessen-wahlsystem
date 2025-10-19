@@ -1,44 +1,46 @@
 import { Resend } from "resend";
-import { IEmailService } from "../types";
+import type { IEmailService } from "../types";
 
 export class EmailService implements IEmailService {
-  private resend: Resend;
+	private resend: Resend;
 
-  constructor(
-    private readonly apiKey: string,
-    private readonly appUrl: string,
-    private readonly fromEmail: string = "LHR Hessen Wahlsystem <poxc@lgll.dev>"
-  ) {
-    if (!apiKey) {
-      throw new Error("Resend API key is required");
-    }
-    this.resend = new Resend(apiKey);
-  }
+	constructor(
+		apiKey: string,
+		private readonly appUrl: string,
+		private readonly fromEmail: string = "LHR Hessen Wahlsystem <poxc@lgll.dev>",
+	) {
+		if (!apiKey) {
+			throw new Error("Resend API key is required");
+		}
+		this.resend = new Resend(apiKey);
+	}
 
-  async sendVotingEmail(email: string, token: string): Promise<void> {
-    const votingLink = `${this.appUrl}/vote?token=${token}`;
+	async sendVotingEmail(email: string, token: string): Promise<void> {
+		const votingLink = `${this.appUrl}/vote?token=${token}`;
 
-    try {
-      const { error } = await this.resend.emails.send({
-        from: this.fromEmail,
-        to: [email],
-        subject: "Ihr persönlicher Wahllink",
-        html: this.generateEmailHtml(votingLink),
-      });
+		try {
+			const { error } = await this.resend.emails.send({
+				from: this.fromEmail,
+				to: [email],
+				subject: "Ihr persönlicher Wahllink",
+				html: this.generateEmailHtml(votingLink),
+			});
 
-      if (error) {
-        throw new Error(`Failed to send email: ${error.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Failed to send email");
-    }
-  }
+			if (error) {
+				throw new Error(
+					`Failed to send email: ${error.message || "Unknown error"}`,
+				);
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				throw error;
+			}
+			throw new Error("Failed to send email");
+		}
+	}
 
-  private generateEmailHtml(votingLink: string): string {
-    return `
+	private generateEmailHtml(votingLink: string): string {
+		return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #333;">Willkommen zum LHR Hessen Wahlsystem</h1>
         <p>Sie haben sich für das Wahlsystem registriert.</p>
@@ -58,17 +60,17 @@ export class EmailService implements IEmailService {
         </p>
       </div>
     `;
-  }
+	}
 }
 
 // Factory function for creating email service with environment variables
 export function createEmailService(): EmailService {
-  const apiKey = process.env.RESEND_API_KEY;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+	const apiKey = process.env.RESEND_API_KEY;
+	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY environment variable is not set");
-  }
+	if (!apiKey) {
+		throw new Error("RESEND_API_KEY environment variable is not set");
+	}
 
-  return new EmailService(apiKey, appUrl);
+	return new EmailService(apiKey, appUrl);
 }

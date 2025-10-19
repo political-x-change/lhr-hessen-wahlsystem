@@ -9,26 +9,22 @@ import { initializeDatabase } from "@/lib/db";
  * or protected with authentication
  */
 export async function GET() {
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: "Database initialization is disabled in production" },
-      { status: 403 }
-    );
-  }
+	if (process.env.NODE_ENV === "production") {
+		return NextResponse.json(
+			{ error: "Database initialization is disabled in production" },
+			{ status: 403 },
+		);
+	}
 
-  try {
-    await initializeDatabase();
-    return NextResponse.json({
-      message: "Database initialized successfully",
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : "Failed to initialize database";
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
-  }
+	try {
+		await initializeDatabase();
+		return NextResponse.json({
+			message: "Database initialized successfully",
+		});
+	} catch (error) {
+		const errorMessage =
+			error instanceof Error ? error.message : "Failed to initialize database";
+
+		return NextResponse.json({ error: errorMessage }, { status: 500 });
+	}
 }
