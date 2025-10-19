@@ -27,23 +27,23 @@ export class Container {
 	private castVoteUseCase?: CastVoteUseCase;
 	private getCandidatesUseCase?: GetCandidatesUseCase;
 
-	getUserRepository(): UserRepository {
+	async getUserRepository(): Promise<UserRepository> {
 		if (!this.userRepository) {
-			this.userRepository = new UserRepository(getDb());
+			this.userRepository = new UserRepository(await getDb());
 		}
 		return this.userRepository;
 	}
 
-	getCandidateRepository(): CandidateRepository {
+	async getCandidateRepository(): Promise<CandidateRepository> {
 		if (!this.candidateRepository) {
-			this.candidateRepository = new CandidateRepository(getDb());
+			this.candidateRepository = new CandidateRepository(await getDb());
 		}
 		return this.candidateRepository;
 	}
 
-	getVoteRepository(): VoteRepository {
+	async getVoteRepository(): Promise<VoteRepository> {
 		if (!this.voteRepository) {
-			this.voteRepository = new VoteRepository(getDb());
+			this.voteRepository = new VoteRepository(await getDb());
 		}
 		return this.voteRepository;
 	}
@@ -62,10 +62,10 @@ export class Container {
 		return this.emailService;
 	}
 
-	getRegisterUserUseCase(): RegisterUserUseCase {
+	async getRegisterUserUseCase(): Promise<RegisterUserUseCase> {
 		if (!this.registerUserUseCase) {
 			this.registerUserUseCase = new RegisterUserUseCase(
-				this.getUserRepository(),
+				await this.getUserRepository(),
 				this.getJwtService(),
 				this.getEmailService(),
 			);
@@ -73,22 +73,22 @@ export class Container {
 		return this.registerUserUseCase;
 	}
 
-	getCastVoteUseCase(): CastVoteUseCase {
+	async getCastVoteUseCase(): Promise<CastVoteUseCase> {
 		if (!this.castVoteUseCase) {
 			this.castVoteUseCase = new CastVoteUseCase(
-				this.getUserRepository(),
-				this.getCandidateRepository(),
-				this.getVoteRepository(),
+				await this.getUserRepository(),
+				await this.getCandidateRepository(),
+				await this.getVoteRepository(),
 				this.getJwtService(),
 			);
 		}
 		return this.castVoteUseCase;
 	}
 
-	getGetCandidatesUseCase(): GetCandidatesUseCase {
+	async getGetCandidatesUseCase(): Promise<GetCandidatesUseCase> {
 		if (!this.getCandidatesUseCase) {
 			this.getCandidatesUseCase = new GetCandidatesUseCase(
-				this.getCandidateRepository(),
+				await this.getCandidateRepository(),
 				false,
 			);
 		}

@@ -2,9 +2,10 @@ import "server-only";
 import { Client } from "pg";
 
 let dbInstance: Client | null = null;
+let isConnecting = false;
 
 // Lazy initialization of database connection
-export function getDb(): Client {
+export async function getDb(): Promise<Client> {
 	if (!dbInstance) {
 		const connectionString = process.env.DATABASE_URL;
 
@@ -15,51 +16,60 @@ export function getDb(): Client {
 		dbInstance = new Client({
 			connectionString,
 		});
+
+		// Connect to the database
+		if (!isConnecting) {
+			isConnecting = true;
+			await dbInstance.connect();
+		}
 	}
 
 	return dbInstance;
 }
 
-// For backward compatibility
+// For backward compatibility - Note: This proxy cannot handle async getDb()
+// Use getDb() directly in new code
 export const db = new Proxy({} as Client, {
 	get(_target, prop) {
-		const dbInstance = getDb();
+		if (!dbInstance) {
+			throw new Error("Database not initialized. Call getDb() first.");
+		}
 		return dbInstance[prop as keyof Client];
 	},
 });
 
 // Initialize database schema
 export async function initializeDatabase() {
-	const db = getDb();
+	const db = await getDb();
 
 	try {
 		// Users table - stores email and token status
 		await db.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
         token_used INTEGER DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
 		// Candidates table - stores candidate information
 		await db.query(`
       CREATE TABLE IF NOT EXISTS candidates (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         image_url TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
 		// Votes table - anonymized, no link to users
 		await db.query(`
       CREATE TABLE IF NOT EXISTS votes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         candidate_id INTEGER NOT NULL,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (candidate_id) REFERENCES candidates(id)
       )
     `);

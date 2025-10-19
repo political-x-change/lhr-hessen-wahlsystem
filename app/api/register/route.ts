@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
 	try {
 		const { email } = await request.json();
 
-		const registerUserUseCase = container.getRegisterUserUseCase();
+		const registerUserUseCase = await container.getRegisterUserUseCase();
 		const result = await registerUserUseCase.execute({ email });
 
 		return NextResponse.json({

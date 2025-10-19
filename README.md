@@ -15,7 +15,7 @@ Eine sichere, DSGVO-konforme Webanwendung für Abstimmungen mit E-Mail-basierter
 
 - **Frontend**: React 19
 - **Backend/API**: Next.js 15 (App Router mit Server Components)
-- **Datenbank**: Turso (libSQL)
+- **Datenbank**: PostgreSQL (via pg client)
 - **E-Mail**: Resend
 - **Authentication**: One-Time-JWT (jsonwebtoken)
 - **Styling**: Tailwind CSS 4
@@ -59,7 +59,7 @@ Siehe [TESTING.md](TESTING.md) für Details.
 
 - Node.js 20 oder höher
 - npm oder yarn
-- Turso-Datenbank (erstellen Sie eine unter [turso.tech](https://turso.tech))
+- PostgreSQL-Datenbank (lokal installiert oder Cloud-Service wie Neon, Supabase, Railway)
 - Resend-Account (erstellen Sie einen unter [resend.com](https://resend.com))
 
 ## Installation
@@ -82,9 +82,11 @@ cp .env.example .env.local
 
 4. `.env.local` mit Ihren Credentials ausfüllen:
 ```env
-# Turso-Datenbank
-DATABASE_URL=libsql://your-database-url.turso.io
-DATABASE_AUTH_TOKEN=your-auth-token
+# PostgreSQL-Datenbank
+# Für lokale Entwicklung
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/lhr_hessen
+# Oder für Cloud-Anbieter (Neon, Supabase, Railway, etc.)
+# DATABASE_URL=postgresql://user:password@host:port/database
 
 # JWT Secret (generieren Sie einen sicheren, zufälligen String)
 JWT_SECRET=your-very-secure-random-secret-key
@@ -98,16 +100,18 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Datenbank-Setup
 
-Die Datenbank wird beim ersten API-Aufruf automatisch initialisiert. Sie können die Initialisierung auch manuell durchführen:
+Die Datenbank muss vor dem ersten Start initialisiert werden:
 
 ```bash
-# Erstellen Sie ein Skript oder rufen Sie die API einmal auf
+# Initialisiere die Datenbank-Schema
+npm run init-db
 ```
 
-Die Datenbank enthält zwei Tabellen:
+Die Datenbank enthält drei Tabellen:
 
 - **users**: Speichert E-Mail-Adressen und Token-Status
-- **votes**: Speichert anonymisierte Abstimmungsdaten (Kandidatenname, Beschreibung)
+- **candidates**: Speichert Kandidateninformationen
+- **votes**: Speichert anonymisierte Abstimmungsdaten
 
 ## Development
 
@@ -158,7 +162,7 @@ Nach erfolgreicher Abstimmung wird Ihr Token invalidiert und Sie können nicht e
 - ✅ Keine Verknüpfung zwischen Benutzer und Stimme
 - ✅ One-Time-JWT für Authentifizierung
 - ✅ Token-Invalidierung nach Abstimmung
-- ✅ Sichere Datenbankverbindung mit Turso
+- ✅ Sichere Datenbankverbindung mit PostgreSQL
 - ✅ Keine Speicherung sensibler Daten
 
 ## API-Endpunkte

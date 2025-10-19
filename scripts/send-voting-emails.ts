@@ -6,25 +6,20 @@
  * Run: npx tsx scripts/send-voting-emails.ts
  */
 
-import { createClient } from "@libsql/client";
+import { Client } from "pg";
 import * as dotenv from "dotenv";
 import { Resend } from "resend";
 import { generateVotingToken } from "../lib/jwt";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
-const {
-	DATABASE_URL,
-	DATABASE_AUTH_TOKEN,
-	RESEND_API_KEY,
-	NEXT_PUBLIC_APP_URL,
-} = process.env;
+const { DATABASE_URL, RESEND_API_KEY, NEXT_PUBLIC_APP_URL } = process.env;
 const APP_URL = NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const FROM_EMAIL = "LHR Hessen Wahlsystem <poxc@lgll.dev>";
 
-if (!DATABASE_URL || !DATABASE_AUTH_TOKEN || !RESEND_API_KEY) {
+if (!DATABASE_URL || !RESEND_API_KEY) {
 	console.error(
-		"Error: DATABASE_URL, DATABASE_AUTH_TOKEN, and RESEND_API_KEY must be set in .env.local",
+		"Error: DATABASE_URL and RESEND_API_KEY must be set in .env.local",
 	);
 	process.exit(1);
 }
@@ -55,19 +50,19 @@ async function sendVotingEmails() {
 	console.log("=".repeat(50));
 	console.log("");
 
-	if (!DATABASE_URL || !DATABASE_AUTH_TOKEN) {
-		throw new Error("Database URL or Auth Token is not defined");
+	if (!DATABASE_URL) {
+		throw new Error("Database URL is not defined");
 	}
 
-	const db = createClient({
-		url: DATABASE_URL,
-		authToken: DATABASE_AUTH_TOKEN,
+	const db = new Client({
+		connectionString: DATABASE_URL,
 	});
 
 	try {
+		await db.connect();
 		console.log("Fetching registered users who haven't voted yet...");
 
-		const result = await db.execute(
+		const result = await db.query(
 			"SELECT id, email FROM users WHERE token_used = 0",
 		);
 
@@ -138,7 +133,7 @@ async function sendVotingEmails() {
 		console.error("❌ Error sending voting emails:", error);
 		process.exit(1);
 	} finally {
-		db.close();
+		await db.end();
 	}
 }
 
