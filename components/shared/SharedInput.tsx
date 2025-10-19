@@ -33,7 +33,7 @@ const SharedInput: React.FC<SharedInputProps> = ({
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full px-4 py-2 border text-text-light/80 dark:text-text-dark/80 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+        className="w-full px-4 py-2 border border-border-light dark:border-border-dark text-text-light/80 dark:text-text-dark/80 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
         placeholder={placeholder}
         disabled={disabled}
       />
