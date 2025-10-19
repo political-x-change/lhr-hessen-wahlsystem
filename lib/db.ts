@@ -1,42 +1,42 @@
 import "server-only";
-import { createClient, Client } from "@libsql/client";
+import { createClient, type Client } from "@libsql/client";
 
 let dbInstance: Client | null = null;
 
 // Lazy initialization of database connection
 export function getDb(): Client {
-  if (!dbInstance) {
-    const url = process.env.DATABASE_URL;
-    const authToken = process.env.DATABASE_AUTH_TOKEN;
-    
-    if (!url) {
-      throw new Error("DATABASE_URL environment variable is not set");
-    }
-    
-    dbInstance = createClient({
-      url,
-      authToken,
-    });
-  }
-  
-  return dbInstance;
+	if (!dbInstance) {
+		const url = process.env.DATABASE_URL;
+		const authToken = process.env.DATABASE_AUTH_TOKEN;
+
+		if (!url) {
+			throw new Error("DATABASE_URL environment variable is not set");
+		}
+
+		dbInstance = createClient({
+			url,
+			authToken,
+		});
+	}
+
+	return dbInstance;
 }
 
 // For backward compatibility
 export const db = new Proxy({} as Client, {
-  get(_target, prop) {
-    const dbInstance = getDb();
-    return dbInstance[prop as keyof Client];
-  },
+	get(_target, prop) {
+		const dbInstance = getDb();
+		return dbInstance[prop as keyof Client];
+	},
 });
 
 // Initialize database schema
 export async function initializeDatabase() {
-  const db = getDb();
-  
-  try {
-    // Users table - stores email and token status
-    await db.execute(`
+	const db = getDb();
+
+	try {
+		// Users table - stores email and token status
+		await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
@@ -45,8 +45,8 @@ export async function initializeDatabase() {
       )
     `);
 
-    // Candidates table - stores candidate information
-    await db.execute(`
+		// Candidates table - stores candidate information
+		await db.execute(`
       CREATE TABLE IF NOT EXISTS candidates (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -56,8 +56,8 @@ export async function initializeDatabase() {
       )
     `);
 
-    // Votes table - anonymized, no link to users
-    await db.execute(`
+		// Votes table - anonymized, no link to users
+		await db.execute(`
       CREATE TABLE IF NOT EXISTS votes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         candidate_id INTEGER NOT NULL,
@@ -65,10 +65,10 @@ export async function initializeDatabase() {
         FOREIGN KEY (candidate_id) REFERENCES candidates(id)
       )
     `);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Database initialization failed: ${error.message}`);
-    }
-    throw new Error("Database initialization failed");
-  }
+	} catch (error) {
+		if (error instanceof Error) {
+			throw new Error(`Database initialization failed: ${error.message}`);
+		}
+		throw new Error("Database initialization failed");
+	}
 }

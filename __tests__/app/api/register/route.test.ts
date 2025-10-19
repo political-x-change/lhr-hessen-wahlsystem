@@ -1,137 +1,137 @@
 import { POST } from "@/app/api/register/route";
 import { container } from "@/lib/container";
-import { RegisterUserUseCase } from "@/lib/use-cases/register-user.use-case";
+import type { RegisterUserUseCase } from "@/lib/use-cases/register-user.use-case";
 import { ValidationError, ConflictError } from "@/lib/errors";
 import { NextRequest } from "next/server";
 
 // Mock the container
 jest.mock("@/lib/container", () => ({
-  container: {
-    getRegisterUserUseCase: jest.fn(),
-  },
+	container: {
+		getRegisterUserUseCase: jest.fn(),
+	},
 }));
 
 describe("POST /api/register", () => {
-  let mockRegisterUserUseCase: jest.Mocked<RegisterUserUseCase>;
+	let mockRegisterUserUseCase: jest.Mocked<RegisterUserUseCase>;
 
-  beforeEach(() => {
-    mockRegisterUserUseCase = {
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<RegisterUserUseCase>;
+	beforeEach(() => {
+		mockRegisterUserUseCase = {
+			execute: jest.fn(),
+		} as unknown as jest.Mocked<RegisterUserUseCase>;
 
-    (container.getRegisterUserUseCase as jest.Mock).mockReturnValue(
-      mockRegisterUserUseCase
-    );
-  });
+		(container.getRegisterUserUseCase as jest.Mock).mockReturnValue(
+			mockRegisterUserUseCase,
+		);
+	});
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
 
-  it("should register user successfully", async () => {
-    mockRegisterUserUseCase.execute.mockResolvedValue({
-      success: true,
-      message: "Registrierung erfolgreich.",
-      alreadyRegistered: false,
-    });
+	it("should register user successfully", async () => {
+		mockRegisterUserUseCase.execute.mockResolvedValue({
+			success: true,
+			message: "Registrierung erfolgreich.",
+			alreadyRegistered: false,
+		});
 
-    const request = new NextRequest("http://localhost:3000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "test@example.com" }),
-    });
+		const request = new NextRequest("http://localhost:3000/api/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email: "test@example.com" }),
+		});
 
-    const response = await POST(request);
-    const data = await response.json();
+		const response = await POST(request);
+		const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data.message).toContain("Registrierung erfolgreich");
-    expect(mockRegisterUserUseCase.execute).toHaveBeenCalledWith({
-      email: "test@example.com",
-    });
-  });
+		expect(response.status).toBe(200);
+		expect(data.message).toContain("Registrierung erfolgreich");
+		expect(mockRegisterUserUseCase.execute).toHaveBeenCalledWith({
+			email: "test@example.com",
+		});
+	});
 
-  it("should return 400 for invalid email", async () => {
-    mockRegisterUserUseCase.execute.mockRejectedValue(
-      new ValidationError("Ungültige E-Mail-Adresse")
-    );
+	it("should return 400 for invalid email", async () => {
+		mockRegisterUserUseCase.execute.mockRejectedValue(
+			new ValidationError("Ungültige E-Mail-Adresse"),
+		);
 
-    const request = new NextRequest("http://localhost:3000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "invalid-email" }),
-    });
+		const request = new NextRequest("http://localhost:3000/api/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email: "invalid-email" }),
+		});
 
-    const response = await POST(request);
-    const data = await response.json();
+		const response = await POST(request);
+		const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toContain("Ungültige");
-  });
+		expect(response.status).toBe(400);
+		expect(data.error).toContain("Ungültige");
+	});
 
-  it("should return 400 if user already voted", async () => {
-    mockRegisterUserUseCase.execute.mockRejectedValue(
-      new ConflictError("Sie haben bereits abgestimmt")
-    );
+	it("should return 400 if user already voted", async () => {
+		mockRegisterUserUseCase.execute.mockRejectedValue(
+			new ConflictError("Sie haben bereits abgestimmt"),
+		);
 
-    const request = new NextRequest("http://localhost:3000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "voted@example.com" }),
-    });
+		const request = new NextRequest("http://localhost:3000/api/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email: "voted@example.com" }),
+		});
 
-    const response = await POST(request);
-    const data = await response.json();
+		const response = await POST(request);
+		const data = await response.json();
 
-    expect(response.status).toBe(409);
-    expect(data.error).toContain("bereits abgestimmt");
-  });
+		expect(response.status).toBe(409);
+		expect(data.error).toContain("bereits abgestimmt");
+	});
 
-  it("should return 200 for already registered user who hasn't voted", async () => {
-    mockRegisterUserUseCase.execute.mockResolvedValue({
-      success: true,
-      message: "Sie sind bereits registriert.",
-      alreadyRegistered: true,
-    });
+	it("should return 200 for already registered user who hasn't voted", async () => {
+		mockRegisterUserUseCase.execute.mockResolvedValue({
+			success: true,
+			message: "Sie sind bereits registriert.",
+			alreadyRegistered: true,
+		});
 
-    const request = new NextRequest("http://localhost:3000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "existing@example.com" }),
-    });
+		const request = new NextRequest("http://localhost:3000/api/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email: "existing@example.com" }),
+		});
 
-    const response = await POST(request);
-    const data = await response.json();
+		const response = await POST(request);
+		const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data.message).toContain("bereits registriert");
-  });
+		expect(response.status).toBe(200);
+		expect(data.message).toContain("bereits registriert");
+	});
 
-  it("should return 500 for server errors", async () => {
-    mockRegisterUserUseCase.execute.mockRejectedValue(
-      new Error("Database connection failed")
-    );
+	it("should return 500 for server errors", async () => {
+		mockRegisterUserUseCase.execute.mockRejectedValue(
+			new Error("Database connection failed"),
+		);
 
-    const request = new NextRequest("http://localhost:3000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "test@example.com" }),
-    });
+		const request = new NextRequest("http://localhost:3000/api/register", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email: "test@example.com" }),
+		});
 
-    const response = await POST(request);
-    const data = await response.json();
+		const response = await POST(request);
+		const data = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(data.error).toBeDefined();
-  });
+		expect(response.status).toBe(500);
+		expect(data.error).toBeDefined();
+	});
 });

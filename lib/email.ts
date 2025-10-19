@@ -1,17 +1,17 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 
 export async function sendVotingEmail(email: string, token: string) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const votingLink = `${appUrl}/vote?token=${token}`;
+	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+	const votingLink = `${appUrl}/vote?token=${token}`;
 
-  try {
-    const { data, error } = await resend.emails.send({
-      from: "LHR Hessen Wahlsystem <poxc@lgll.dev>", // Replace with your verified domain
-      to: [email],
-      subject: "Ihr persönlicher Wahllink",
-      html: `
+	try {
+		const { data, error } = await resend.emails.send({
+			from: "LHR Hessen Wahlsystem <poxc@lgll.dev>", // Replace with your verified domain
+			to: [email],
+			subject: "Ihr persönlicher Wahllink",
+			html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333;">Willkommen zum LHR Hessen Wahlsystem</h1>
           <p>Sie haben sich für das Wahlsystem registriert.</p>
@@ -31,17 +31,19 @@ export async function sendVotingEmail(email: string, token: string) {
           </p>
         </div>
       `,
-    });
+		});
 
-    if (error) {
-      throw new Error(`Failed to send email: ${error.message || 'Unknown error'}`);
-    }
+		if (error) {
+			throw new Error(
+				`Failed to send email: ${error.message || "Unknown error"}`,
+			);
+		}
 
-    return data;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Failed to send email");
-  }
+		return data;
+	} catch (error) {
+		if (error instanceof Error) {
+			throw error;
+		}
+		throw new Error("Failed to send email");
+	}
 }
